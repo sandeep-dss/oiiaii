@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oooiiaaiii</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin:  0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        #gif {
+            width: 300px;
+            height: auto;
+            margin: 20px auto;
+            display: block;
+        }
+
+        .buttons {
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OiiAii Keyboard</h1>
+        <canvas id="gifCanvas" width="300" height="300"></canvas>
+        <div class="buttons">
+            <button id="button1">A</button>
+            <button id="button2">B</button>
+            <button id="button3">C</button>
+            <button id="button4">D</button>
+        </div>
+        <audio id="sound1" src="./assets/audio-1.wav"></audio>
+        <audio id="sound2" src="./assets/audio-2.wav"></audio>
+        <audio id="sound3" src="./assets/audio-3.wav"></audio>
+        <audio id="sound4" src="./assets/audio-4.wav"></audio>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gifCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const frameImages = [
+            './assets/frame1.png',
+            './assets/frame2.png',
+            './assets/frame5.png',
+            './assets/frame6.png'
+        ];
+
+        const sounds = [
+            document.getElementById('sound1'),
+            document.getElementById('sound2'),
+            document.getElementById('sound3'),
+            document.getElementById('sound4')
+        ];
+
+        const buttons = [
+            document.getElementById('button1'),
+            document.getElementById('button2'),
+            document.getElementById('button3'),
+            document.getElementById('button4')
+        ];
+
+        let frameCounter = 0;
+        const totalFrames = frameImages.length;
+        const resetTime = 2000; // timer to reset
+
+        let resetTimeout;
+
+        const loadImage = (src) => {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = src;
+            });
+        };
+
+        const drawFrame = async (index) => {
+            const img = await loadImage(frameImages[index]);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+
+        buttons.forEach((button, index) => {
+            button.addEventListener('click', async () => {
+                sounds[index].currentTime = 0;
+                sounds[index].play();
+
+                clearTimeout(resetTimeout);
+
+                frameCounter = index;
+                await drawFrame(frameCounter);
+
+                resetTimeout = setTimeout(() => {
+                    frameCounter = 0;
+                    drawFrame(frameCounter);
+                }, resetTime);
+            });
+        });
+
+        drawFrame(frameCounter);
+    </script>
+</body>
+</html>
